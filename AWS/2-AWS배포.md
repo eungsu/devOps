@@ -232,6 +232,86 @@
 5. "Webhooks" 등록화면에서 "Webhooks" 등록 후 젠킨스와 연결상태를 확인한다.
 ![webhook 연결 확인](images/git-8.png)
 
+6. Jenkins 프로젝트 등록하기 (위에서 이미 생성한 프로젝트에서 아래의 내용을 추가한다.)  
+   1. 젠킨스 홈 화면에서 "sample project"를 선택한다.
+   ![jenkin webhook 설정](images/jenkins-9.png)
+
+   2. 해당 프로젝트에서 "구성" 메뉴를 클릭한다.
+   ![jenkin webhook 설정](images/jenkins-10.png)
+
+   3. "Trigger"항목에서 "GitHub hook trigger for GITScm polling"를 체크한다.
+   ![jenkin webhook 설정](images/jenkins-11.png)
+
+   4. "빌드 후 조치 추가"버튼을 클릭하고, "Post build task"를 선택한다.
+   ![jenkin webhook 설정](images/jenkins-12.png)
+
+   5. "Post build task"의 각 입력필드에 아래의 내용을 입력한다.
+   ![jenkin webhook 설정](images/jenkins-13.png)
+
+        ```
+        # Log text
+        "BUILD SUCCESSFUL"을 입력한다.
+
+
+        # Operation
+        "-- AND --"를 선택한다
+
+
+        # Script
+        echo "-----------------------------------------------------"
+        echo "실행 중인 스프링 웹 애플리케이션 종료 -- 시작"
+        echo "-----------------------------------------------------"
+        JAR_NAME=demo-web-1-0.0.1-SNAPSHOT.jar
+
+        if [ -z "`ps -eaf | grep $JAR_NAME | grep -v grep`" ]; then
+        echo "not found $JAR_NAME"
+        else
+        ps -eaf | grep $JAR_NAME | grep -v grep | awk '{print $2}' |
+        while read PID
+        do
+            echo "Killing $PID ..."
+            sudo kill -9 $PID
+            echo "$PID is shutdown!"
+        done
+        fi
+
+        echo "-----------------------------------------------------"
+        echo "실행 중인 스프링 웹 애플리케이션 종료 -- 완료"
+        echo "-----------------------------------------------------"
+        ```
+
+   6. 다시, 빌드 후 조치 추가"버튼을 클릭하고, "Post build task"를 선택한 다음 아래의 내용을 입력한다.
+   ![jenkin webhook 설정](images/jenkins-14.png)
+
+        ```
+        # Log text
+        "완료"을 입력한다.
+
+
+        # Operation
+        "-- AND --"를 선택한다
+        
+
+        # Script
+        echo "---------------------------------"
+        echo "웹 애플리케이션 배포 -- 시작"
+        echo "----------------------------------"
+
+        JAR_NAME=demo-web-1-0.0.1-SNAPSHOT.jar
+        sudo nohup java -jar "/var/lib/jenkins/workspace/demo-web/build/libs/$JAR_NAME" /dev/null 2>&1 &
+
+        echo "---------------------------------"
+        echo "웹 애플리케이션 배포 -- 완료"
+        echo "---------------------------------"
+        ```
+    7. Github에 소스코드를 Push 후, 젠킨스에서 해당 프로젝트가 빌드되는 것을 확인할 수 있다.
+    ![jenkin webhook 설정](images/jenkins-15.png)
+
+    8. 해당 프로젝트 빌드의 콘솔출력 내용을 확인할 수 있다.
+    ![jenkin webhook 설정](images/jenkins-16.png) 
+
+    9. 스프링 부트 프로젝트가 EC2 서버에 정상적으로 배포되었는지 확인하자.
+
 ## EC2 인스턴스에 도메인 연결하기 (가비아 기준)
 
 1. [가비아](https://www.gabia.com/)에서 도메인을 등록한다.
