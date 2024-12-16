@@ -131,17 +131,25 @@
     sudo visudo
 
     # sudoers 파일 내용의 마지막 줄에 아래 내용을 추가한다.
-    jenkins ALL=(AlL)   NOPASSWD: ALL
+    jenkins ALL=(ALL)   NOPASSWD: ALL
     ```
 
 4. 웹 브라우저에서 ```http://IP주소:8080```주소로 Jenkins에 접속한다.
 
 5. 초기 관리자 비밀번호를 입력한다.
 
-6. 초기 설정 마법사를 따라 플러그인 설치 및 관리자 계정 생성을 완료한다.
+    ```bash
+    # cat 명령어를 실행한다.
+    sudo cat /var/lib/jenkins/secrets/initialAdminPasswor
+
+    # 츨력 예시
+    07f9ebe0da3149e095813f1f9e8940f3   <----- 임시비밀번호를 복사한다.
+    ```
+
+7. 초기 설정 마법사를 따라 플러그인 설치 및 관리자 계정 생성을 완료한다.
 ![젠킨스 설치](images/ec2-12.png)
 
-7. 추가로 Jenkins 플러그인 설치하기
+8. 추가로 Jenkins 플러그인 설치하기
     1. 젠킨스 홈화면의 좌측 메뉴에서 "Jenkins 관리"를 클릭한다.
     ![jenkins](images/jenkins-1.png)
 
